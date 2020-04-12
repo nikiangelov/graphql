@@ -36,6 +36,17 @@ export default {
         });
       });
     },
+    editUserAsync: async (root, { _id, username, email, password }) => {
+      const response = await User.findByIdAndUpdate(
+        { _id },
+        { $set: { username, email, password } },
+        { new: true, useFindAndModify: false }
+      ).exec();
+      if (!response) {
+        throw new Error(`Cannot save user: ${_id}`);
+      }
+      return response;
+    },
     editUser: (root, { _id, user }) => {
       return new Promise((resolve, reject) => {
         const { username, email, password } = user;
