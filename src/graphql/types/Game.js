@@ -7,6 +7,14 @@ export default `
         price: Float!
     }
 
+    input GameInput {
+        _id: String!
+        name: String!
+        description: String!
+        imageUrl: String!
+        price: Float!
+    }
+
     type Query {
         game(_id: String!): Game
         games: [Game]

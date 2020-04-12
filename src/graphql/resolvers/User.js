@@ -69,6 +69,31 @@ export default {
         });
       });
     },
+    updateUser: (root, { _id, user, games }) => {
+      return new Promise((resolve, reject) => {
+        const { username, email, password } = user;
+        let newSet = {};
+        if (username) {
+          newSet.username = username;
+        }
+        if (email) {
+          newSet.email = email;
+        }
+        if (password) {
+          newSet.password = password;
+        }
+        if (games) {
+          newSet.games = games;
+        }
+        User.findByIdAndUpdate(
+          { _id },
+          { $set: newSet },
+          { new: true, useFindAndModify: false }
+        ).exec((error, response) => {
+          error ? reject(error) : resolve(response);
+        });
+      });
+    },
     addUserGame: (root, { _id, gameId }) => {
       return new Promise((resolve, reject) => {
         User.findById(_id, function (err, user) {

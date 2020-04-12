@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import Game from "./Game";
+
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -14,9 +16,8 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
-  gamesIds: {
-    type: [String],
-    required: false,
+  games: {
+    type: [Game.schema],
   },
 });
 
