@@ -11,6 +11,11 @@ export default `
     }
 
     input UserInput {
+        username: String!
+        email: String!
+        password: String!
+    }
+    input UserEditInput {
         username: String
         email: String
         password: String
@@ -25,7 +30,7 @@ export default `
         registerUser(user: UserInput!): User
         loginUser(username: String!, password: String!): String
         deleteUser(_id: String!): User
-        editUser(_id: String!, user: UserInput! ): User
+        editUser(_id: String!, user: UserEditInput! ): User
         addUserGame(_id: String!, gameId: String!): User
         removeUserGame(_id: String!, gameId: String!): User
     }

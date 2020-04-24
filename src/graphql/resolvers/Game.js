@@ -20,8 +20,8 @@ export default {
     },
   },
   Mutation: {
-    addGame: (root, { name, description, imageUrl, price }) => {
-      const newGame = new Game({ name, description, imageUrl, price });
+    addGame: (root, { game }) => {
+      const newGame = new Game(game);
       return new Promise((resolver, reject) => {
         newGame.save((error, response) => {
           error ? reject(error) : resolver(response);
@@ -35,15 +35,14 @@ export default {
         });
       });
     },
-    editGame: (root, { _id, name, description, imageUrl, price }) => {
+    editGame: (root, { _id, game }) => {
       return new Promise((resolver, reject) => {
-        Game.findByIdAndUpdate(
-          { _id },
-          { $set: { name, description, imageUrl, price } },
-          { new: true }
-        ).exec((error, response) => {
-          error ? reject(error) : resolver(response);
-        });
+        // const { name, description, imageUrl, price } = game;
+        Game.findByIdAndUpdate({ _id }, { $set: game }, { new: true }).exec(
+          (error, response) => {
+            error ? reject(error) : resolver(response);
+          }
+        );
       });
     },
   },

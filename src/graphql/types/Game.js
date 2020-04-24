@@ -8,11 +8,16 @@ export default `
     }
 
     input GameInput {
-        _id: String!
         name: String!
         description: String!
         imageUrl: String!
         price: Float!
+    }
+    input GameEditInput {
+        name: String
+        description: String
+        imageUrl: String
+        price: Float
     }
 
     type Query {
@@ -21,8 +26,8 @@ export default `
     }
 
     type Mutation {
-        addGame(name: String!, description: String!, imageUrl: String!, price: Float!): Game
+        addGame(game: GameInput!): Game
         deleteGame(_id: String!): Game
-        editGame(_id: String!, name: String, description: String, imageUrl: String, price: Float ): Game
+        editGame(_id: String!, game: GameEditInput!): Game
     }
 `;
