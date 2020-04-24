@@ -13,11 +13,14 @@ const app = express();
 
 const PORT = process.env.PORT || "3001";
 const db = process.env.MONGODB_URL;
+const SECRET = process.env.LOGIN_SECRET;
 
 mongoose
   .connect(db, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
   })
   .then(() => {
     console.log("Connected");
@@ -33,6 +36,9 @@ app.use(
   expressGraphQL({
     schema,
     graphiql: true,
+    context: {
+      SECRET,
+    },
   })
 );
 

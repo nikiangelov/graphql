@@ -1,10 +1,12 @@
 export default `
+    """
+    A type that describes the user.
+    """
     type User {
         _id: String!
         username: String!
         email: String!
         password: String!
-        gameIds: [String]
         games: [Game] 
     }
 
@@ -19,13 +21,12 @@ export default `
         users: [User]
     }
 
-    type Mutation {
-        addUser(user: UserInput!): User
+    type Mutation { 
+        registerUser(user: UserInput!): User
+        loginUser(username: String!, password: String!): String
         deleteUser(_id: String!): User
         editUser(_id: String!, user: UserInput! ): User
-        editUserAsync(_id: String!, username: String, email: String, password: String ): User
         addUserGame(_id: String!, gameId: String!): User
         removeUserGame(_id: String!, gameId: String!): User
-        updateUser(_id: String!, user: UserInput, games: [GameInput]): User
     }
 `;
