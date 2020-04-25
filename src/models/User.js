@@ -4,10 +4,13 @@ import Game from "./Game";
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-  username: {
+  firstName: {
     type: String,
     required: true,
-    unique: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
   },
   email: {
     type: String,
@@ -15,6 +18,10 @@ const UserSchema = new Schema({
     unique: true,
   },
   password: {
+    type: String,
+    required: true,
+  },
+  userType: {
     type: String,
     required: true,
   },

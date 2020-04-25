@@ -2,6 +2,10 @@ import User from "../../models/User";
 import Game from "../../models/Game";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import validator from "validator";
+import ValidationError from "../ValidationError";
+
+const JWT_EXPIRATION = "5min";
 
 export default {
   Query: {
@@ -21,23 +25,85 @@ export default {
           });
       });
     },
+    currentUser: async (root, args, { authenticatedUser }) => {
+      if (!authenticatedUser) {
+        throw new ValidationError([
+          {
+            key: "user",
+            message: "user_not_authenticated",
+          },
+        ]);
+      }
+      return await User.findById(authenticatedUser._id);
+    },
   },
   Mutation: {
-    registerUser: async (root, { user }) => {
-      const { username, email, password } = user;
-      const hashedPassword = await bcrypt.hash(password, 12);
-      const newUser = new User({ username, email, password: hashedPassword });
-      const response = await newUser.save();
-      if (!response) {
-        throw new Error(
-          `Не можем да регистрираме потребител с email:  ${email}`
-        );
+    registerUser: async (root, { user }, { JWT_SECRET }) => {
+      const { firstName, lastName, email, password, userType } = user;
+      let errors = [];
+      if (validator.isEmpty(firstName)) {
+        errors.push({
+          key: "firstName",
+          message: "is_empty",
+        });
       }
-      return response;
+      if (validator.isEmpty(lastName)) {
+        errors.push({
+          key: "lastName",
+          message: "is_empty",
+        });
+      }
+      if (!validator.isEmail(email)) {
+        errors.push({
+          key: "email",
+          message: "email_not_valid",
+        });
+      }
+      if (!validator.isLength(password, { min: 6, max: 20 })) {
+        errors.push({
+          key: "password",
+          message: "password_length",
+        });
+      }
+      if (errors.length) {
+        throw new ValidationError(errors);
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const newUser = new User({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        userType,
+      });
+      let loginToken = null;
+      try {
+        const savedUser = await newUser.save();
+        if (!savedUser) {
+          throw new Error(
+            `Не можем да регистрираме потребител с email:  ${email}`
+          );
+        }
+        loginToken = jwt.sign(
+          {
+            _id: savedUser._id,
+            email: savedUser.email,
+          },
+          JWT_SECRET,
+          {
+            expiresIn: JWT_EXPIRATION,
+          }
+        );
+      } catch (error) {
+        console.log(`Възникна проблем: ${error}`);
+      }
+      return loginToken;
     },
-    loginUser: async (root, { username, password }, { SECRET }) => {
+    loginUser: async (root, { email, password }, { JWT_SECRET }) => {
+      console.log(authenticatedUser);
       const user = await User.findOne({
-        username,
+        email,
       });
       if (!user) {
         throw new Error(`Този потребител не съществува.`);
@@ -48,12 +114,11 @@ export default {
       }
       const token = jwt.sign(
         {
-          username: user.username,
           email: user.email,
         },
-        SECRET,
+        JWT_SECRET,
         {
-          expiresIn: "3min",
+          expiresIn: JWT_EXPIRATION,
         }
       );
 
@@ -66,17 +131,26 @@ export default {
         });
       });
     },
-    editUser: async (root, { _id, user }) => {
-      const { username, email, password } = user;
+    editUser: async (root, { _id, user }, { authenticatedUser }) => {
+      if (!authenticatedUser) {
+        throw new Error("Не сте влезли в профила си");
+      }
+      const { firstName, lastName, email, password, userType } = user;
       let newSet = {};
-      if (username) {
-        newSet.username = username;
+      if (firstName) {
+        newSet.firstName = firstName;
+      }
+      if (lastName) {
+        newSet.lastName = lastName;
       }
       if (email) {
         newSet.email = email;
       }
       if (password) {
         newSet.password = await bcrypt.hash(password, 12);
+      }
+      if (userType) {
+        newSet.userType = userType;
       }
       const response = await User.findByIdAndUpdate(
         { _id },

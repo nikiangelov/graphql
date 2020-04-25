@@ -1,34 +1,38 @@
 export default `
-    """
-    A type that describes the user.
-    """
     type User {
         _id: String!
-        username: String!
+        firstName: String!
+        lastName: String!
         email: String!
         password: String!
+        userType: String!
         games: [Game] 
     }
 
     input UserInput {
-        username: String!
+        firstName: String!
+        lastName: String!
         email: String!
         password: String!
+        userType: String!
     }
     input UserEditInput {
-        username: String
+        firstName: String
+        lastName: String
         email: String
         password: String
+        userType: String
     }
 
     type Query {
         user(_id: String!): User
         users: [User]
+        currentUser: User
     }
 
     type Mutation { 
-        registerUser(user: UserInput!): User
-        loginUser(username: String!, password: String!): String
+        registerUser(user: UserInput!): String
+        loginUser(email: String!, password: String!): String
         deleteUser(_id: String!): User
         editUser(_id: String!, user: UserEditInput! ): User
         addUserGame(_id: String!, gameId: String!): User
