@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import jwt from "express-jwt";
 
 import schema from "./graphql/GraphqlSchema";
+import ValidationError from "./graphql/ValidationError";
 
 const app = express();
 
@@ -48,13 +49,16 @@ app.use(
         authenticatedUser: req.user,
         JWT_SECRET,
       },
-      formatError: (error) => ({
-        message: error.message,
-        validationErrors:
-          error.originalError && error.originalError.validationErrors,
-        locations: error.locations,
-        path: error.path,
-      }),
+      formatError: (error) => {
+        if (error.originalError instanceof ValidationError) {
+          return {
+            message: error.message,
+            validationErrors:
+              error.originalError && error.originalError.validationErrors,
+          };
+        }
+        return error;
+      },
     };
   })
 );

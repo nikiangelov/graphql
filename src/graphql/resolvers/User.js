@@ -135,16 +135,13 @@ export default {
       if (!authenticatedUser) {
         throw new Error("Не сте влезли в профила си");
       }
-      const { firstName, lastName, email, password, userType } = user;
+      const { firstName, lastName, password, userType } = user;
       let newSet = {};
       if (firstName) {
         newSet.firstName = firstName;
       }
       if (lastName) {
         newSet.lastName = lastName;
-      }
-      if (email) {
-        newSet.email = email;
       }
       if (password) {
         newSet.password = await bcrypt.hash(password, 12);
