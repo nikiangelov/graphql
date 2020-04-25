@@ -14,7 +14,6 @@ export default `
         lastName: String!
         email: String!
         password: String!
-        userType: String!
     }
     input UserEditInput {
         firstName: String

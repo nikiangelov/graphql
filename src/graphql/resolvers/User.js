@@ -39,7 +39,7 @@ export default {
   },
   Mutation: {
     registerUser: async (root, { user }, { JWT_SECRET }) => {
-      const { firstName, lastName, email, password, userType } = user;
+      const { firstName, lastName, email, password } = user;
       let errors = [];
       if (validator.isEmpty(firstName)) {
         errors.push({
@@ -75,7 +75,7 @@ export default {
         lastName,
         email,
         password: hashedPassword,
-        userType,
+        userType: "regular",
       });
       let loginToken = null;
       try {
@@ -101,7 +101,6 @@ export default {
       return loginToken;
     },
     loginUser: async (root, { email, password }, { JWT_SECRET }) => {
-      console.log(authenticatedUser);
       const user = await User.findOne({
         email,
       });
@@ -114,6 +113,7 @@ export default {
       }
       const token = jwt.sign(
         {
+          _id: user._id,
           email: user.email,
         },
         JWT_SECRET,
