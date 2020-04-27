@@ -41,6 +41,20 @@ export default {
     registerUser: async (root, { user }, { JWT_SECRET }) => {
       const { firstName, lastName, email, password } = user;
       let errors = [];
+      if (!validator.isEmail(email)) {
+        errors.push({
+          key: "email",
+          message: "email_not_valid",
+        });
+      } else {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          errors.push({
+            key: "email",
+            message: "email_exists",
+          });
+        }
+      }
       if (validator.isEmpty(firstName)) {
         errors.push({
           key: "firstName",
@@ -51,12 +65,6 @@ export default {
         errors.push({
           key: "lastName",
           message: "is_empty",
-        });
-      }
-      if (!validator.isEmail(email)) {
-        errors.push({
-          key: "email",
-          message: "email_not_valid",
         });
       }
       if (!validator.isLength(password, { min: 6, max: 20 })) {
